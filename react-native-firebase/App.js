@@ -4,6 +4,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import app from './firebaseConfig.js';
+
+const auth = getAuth(app);
 
 // Navegação
 const Stack = createStackNavigator();
@@ -19,13 +23,11 @@ const Login = ({ navigation, route }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    const userExists = users.find(
-      (user) => user.username === username && user.password === password
-    );
-    if (userExists) {
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, username, password);
       route.params.funcLogar(true);
-    } else {
+    } catch (err) {
       setError('Usuário ou senha incorretos');
     }
   };
@@ -59,17 +61,16 @@ const Registrar = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (password !== confirmPassword) {
       setError('As senhas não coincidem');
       return;
     }
-    const userExists = users.find((user) => user.username === username);
-    if (userExists) {
-      setError('Usuário já existe');
-    } else {
-      users.push({ username, password });
+    try {
+      await createUserWithEmailAndPassword(auth, username, password);
       navigation.navigate('Login');
+    } catch (err) {
+      setError('Erro ao registrar: ' + err.message);
     }
   };
 
