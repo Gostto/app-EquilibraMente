@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Text, Animated, Easing } from 'react-native';
+import { View, Button, Text, TextInput, Animated, Easin, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -10,20 +10,108 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
-// Componentes individuais
-const Login = ({ navigation, route }) => (
-  <View>
-    <Button onPress={() => route.params.funcLogar(true)} title="Logar" />
-    <Button onPress={() => navigation.navigate('Registrar')} title="Registrar" />
+// Dados de usuário simulados (em um app real, estariam em um banco de dados)
+const users = [{ username: 'usuario', password: 'senha123' }];
+
+// Tela de Login
+const Login = ({ navigation, route }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleLogin = () => {
+    const userExists = users.find(
+      (user) => user.username === username && user.password === password
+    );
+    if (userExists) {
+      route.params.funcLogar(true);
+    } else {
+      setError('Usuário ou senha incorretos');
+    }
+  };
+
+  return (
+    <View style={{ padding: 20 }}>
+      <TextInput
+        placeholder="Usuário"
+        value={username}
+        onChangeText={setUsername}
+        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+      />
+      <TextInput
+        placeholder="Senha"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+      />
+      <Button title="Entrar" onPress={handleLogin} />
+      {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
+      <Button title="Registrar-se" onPress={() => navigation.navigate('Registrar')} />
+    </View>
+  );
+};
+
+// Tela de Registro
+const Registrar = ({ navigation }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleRegister = () => {
+    if (password !== confirmPassword) {
+      setError('As senhas não coincidem');
+      return;
+    }
+    const userExists = users.find((user) => user.username === username);
+    if (userExists) {
+      setError('Usuário já existe');
+    } else {
+      users.push({ username, password });
+      navigation.navigate('Login');
+    }
+  };
+
+  return (
+    <View style={{ padding: 20 }}>
+      <TextInput
+        placeholder="Usuário"
+        value={username}
+        onChangeText={setUsername}
+        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+      />
+      <TextInput
+        placeholder="Senha"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+      />
+      <TextInput
+        placeholder="Confirmar Senha"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
+        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+      />
+      <Button title="Registrar" onPress={handleRegister} />
+      {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
+    </View>
+  );
+};
+
+const Perfil = () => (
+  <View style={styles.container}>
+    <Text>Gerencie seu perfil e informações aqui.</Text>
   </View>
 );
 
-const Registrar = () => <Text>Registrar</Text>;
-const Avisos = () => <Text>Avisos</Text>;
-const Perfil = () => <Text>Perfil</Text>;
-const Home = () => <Text>Home</Text>;
-const Config = () => <Text>Config</Text>;
-const Contatos = () => <Text>Contatos</Text>;
+const TabAvisos = () => (
+  <View style={styles.container}>
+    <Text>Avisos e lembretes aparecerão aqui!</Text>
+  </View>
+);
 
 // Temporizador de Respiração
 const Respiracao = () => {
@@ -104,7 +192,7 @@ const App = () => {
   const HomeTab = () => (
     <Tab.Navigator>
       <Tab.Screen name="Home_tab" component={HomeStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Avisos" component={Avisos} />
+      <Tab.Screen name="Avisos" component={TabAvisos} />
     </Tab.Navigator>
   );
 
@@ -126,5 +214,19 @@ const App = () => {
     </NavigationContainer>
   );
 };
+
+// Componentes Home, Config e Contatos
+const Home = () => <Text>Home</Text>;
+const Config = () => <Text>Config</Text>;
+const Contatos = () => <Text>Contatos</Text>;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+  },
+});
 
 export default App;
