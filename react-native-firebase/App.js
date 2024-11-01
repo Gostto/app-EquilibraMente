@@ -187,12 +187,12 @@ const Respiracao = () => {
 
     iniciarAnimacao(fase);
 
-    return () => clearInterval(intervalo);
+    return () => clearInterval(intervalo); 
   }, [fase]);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>{fase} por {contador} segundos</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>{fase} por {contador} segundos</Text>
       <Animated.View
         style={{
           width: 100,
@@ -202,9 +202,22 @@ const Respiracao = () => {
           transform: [{ scale: animacao }],
         }}
       />
+      <Text style={styles.subText}>Respire profundamente e acalme sua mente.</Text>
     </View>
   );
 };
+
+const Agendamento = () => (
+  <View style={styles.container}>
+    <Text>Agendamentos para consultas</Text>
+  </View>
+);
+
+const SobreNos = () => (
+  <View style={styles.container}>
+    <Text></Text>
+  </View>
+);
 
 const App = () => {
   const [EstaLogado, setLogado] = useState(false);
@@ -214,6 +227,8 @@ const App = () => {
       <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
       <Stack.Screen name="Perfil" component={Perfil} />
       <Stack.Screen name="Respiracao" component={Respiracao} options={{ title: 'Exercício de Respiração' }} />
+      <Stack.Screen name="Agendamento" component={Agendamento} options={{ title: 'Agendamentos' }} />
+      <Stack.Screen name="SobreNos" component={SobreNos} options={{ title: 'Sobre Nós' }} />
     </Stack.Navigator>
   );
 
@@ -229,8 +244,6 @@ const App = () => {
       {EstaLogado ? (
         <Drawer.Navigator>
           <Drawer.Screen name="Home" component={HomeTab} />
-          <Drawer.Screen name="Config" component={Config} />
-          <Drawer.Screen name="Contatos" component={Contatos} />
           
         </Drawer.Navigator>
       ) : (
@@ -243,9 +256,41 @@ const App = () => {
   );
 };
 
-const Home = () => <Text>Home</Text>;
-const Config = () => <Text>Config</Text>;
-const Contatos = () => <Text>Contatos</Text>;
+const Home = ({ navigation }) => {
+  return (
+    <View style={styles.homeContainer}>
+      <Text style={styles.title}>Bem-vindo(a) ao EquilibraMente</Text>
+      
+      <TouchableOpacity 
+        style={styles.optionButton} 
+        onPress={() => navigation.navigate('Perfil')}
+      >
+        <Text style={styles.optionButtonText}>Perfil</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity 
+        style={styles.optionButton} 
+        onPress={() => navigation.navigate('Respiracao')}
+      >
+        <Text style={styles.optionButtonText}>Exercício de Respiração</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity 
+        style={styles.optionButton} 
+        onPress={() => alert('Função de agendamento em breve!')}
+      >
+        <Text style={styles.optionButtonText}>Agendamento de Consultas</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity 
+        style={styles.optionButton} 
+        onPress={() => navigation.navigate('SobreNos')}
+      >
+        <Text style={styles.optionButtonText}>Sobre Nós</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -333,6 +378,29 @@ const styles = StyleSheet.create({
     width: 100, // Largura da imagem
     height: 100, // Altura da imagem
     marginBottom: 20, // Espaço entre a imagem e o título "Bem-vindo!"
+  },
+  homeContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    margin: 20,
+    borderRadius: 10,
+  },
+  optionButton: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 10,
+    width: '100%',
+  },
+  optionButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
