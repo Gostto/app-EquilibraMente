@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Text, TextInput, Animated, Easing, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
+import { View, Button, Text, TextInput, Animated, Easing, StyleSheet, ImageBackground, TouchableOpacity, Image, FlatList } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -7,6 +7,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import app from './firebaseConfig.js';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { WebView } from 'react-native-webview';
 
 const image = {uri: 'https://lh6.googleusercontent.com/proxy/2u8JACI6bBeCaamYijrU8jyhZGADPr2Px0MCGuWdzkubPwhW4T7PO40anM6ciozTRaelmP_1jIn9i9Qme59kqnm2Dg0-M2eEmtv9D7DBBxl3tSRX6hZCywdQgkdN9ZJSoYMxcg1AiWXCqhYY0TOTCgInHUd3'};
 
@@ -131,11 +132,62 @@ const Registrar = ({ navigation }) => {
   );
 };
 
-const Perfil = () => (
-  <View style={styles.container}>
-    <Text>Gerencie seu perfil e informações aqui.</Text>
-  </View>
-);
+const dicas = [
+  {
+    id: '1',
+    tipo: 'texto',
+    conteudo: '🫁 Pratique a respiração profunda: inspire contando até quatro, segure e expire contando até seis. Ultilize o nosso exercício de respiração para te ajudar.',
+  },
+  {
+    id: '2',
+    tipo: 'texto',
+    conteudo: '🍃 Experimente um vídeo de respiração guiada, ótimas para quem procura uma calmaria em momentos de crise.',
+  },
+  {
+    id: '3',
+    tipo: 'texto',
+    conteudo: '🧘🏻‍♀️ Experimente a técnica de mindfulness: observe seus pensamentos sem julgá-los e concentre-se no momento presente.',
+  },
+  {
+    id: '4',
+    tipo: 'texto',
+    conteudo: '🤸🏻 Pratique alongamentos leves. Movimentar o corpo ajuda a liberar a tensão acumulada e relaxar a mente.',
+  },
+  {
+    id: '5',
+    tipo: 'texto',
+    conteudo: '🎵 Escute uma música calma e relaxante, preferencialmente sem letras, para ajudar a desacelerar os pensamentos.',
+},
+];
+
+
+const Dicas = () => {
+  const renderItem = ({ item }) => {
+    if (item.tipo === 'texto') {
+      return (
+        <View style={styles.dicaContainer}>
+          <Text style={styles.dicaTexto}>{item.conteudo}</Text>
+        </View>
+      );
+    } else if (item.tipo === 'video') {
+      return (
+        <View style={styles.videoContainer}>
+          <WebView source={{ uri: item.conteudo }} style={{ height: 200, width: '100%' }} />
+        </View>
+      );
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={dicas}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+      />
+    </View>
+  );
+};
 
 const TabAvisos = () => (
   <View style={styles.container}>
@@ -225,7 +277,7 @@ const App = () => {
   const HomeStack = () => (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Stack.Screen name="Perfil" component={Perfil} />
+      <Stack.Screen name="Dicas" component={Dicas} options={{ title: 'Dicas para Mente' }} />
       <Stack.Screen name="Respiracao" component={Respiracao} options={{ title: 'Exercício de Respiração' }} />
       <Stack.Screen name="Agendamento" component={Agendamento} options={{ title: 'Agendamentos' }} />
       <Stack.Screen name="SobreNos" component={SobreNos} options={{ title: 'Sobre Nós' }} />
@@ -258,14 +310,15 @@ const App = () => {
 
 const Home = ({ navigation }) => {
   return (
+    <ImageBackground source={image} style={styles.backgroundImage}>
     <View style={styles.homeContainer}>
       <Text style={styles.title}>Bem-vindo(a) ao EquilibraMente</Text>
       
       <TouchableOpacity 
         style={styles.optionButton} 
-        onPress={() => navigation.navigate('Perfil')}
+        onPress={() => navigation.navigate('Dicas')}
       >
-        <Text style={styles.optionButtonText}>Perfil</Text>
+        <Text style={styles.optionButtonText}>Dicas para Mente</Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
@@ -289,6 +342,7 @@ const Home = ({ navigation }) => {
         <Text style={styles.optionButtonText}>Sobre Nós</Text>
       </TouchableOpacity>
     </View>
+    </ImageBackground>
   );
 };
 
@@ -401,6 +455,21 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  dicaContainer: {
+    padding: 15,
+    backgroundColor: '#e6f7ff',
+    borderRadius: 8,
+    marginVertical: 10,
+  },
+  dicaTexto: {
+    fontSize: 16,
+    color: '#333',
+  },
+  videoContainer: {
+    marginVertical: 10,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
 });
 
