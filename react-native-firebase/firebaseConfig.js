@@ -10,7 +10,6 @@ const firebaseConfig = {
   measurementId: "G-W7JH82RN2J"
 };
 
-// Inicialize apenas se o Firebase ainda não tiver sido inicializado
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 
 export default app;

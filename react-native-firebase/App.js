@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Text, TextInput, Animated, Easin, StyleSheet } from 'react-native';
+import { View, Button, Text, TextInput, Animated, Easing, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -8,19 +8,18 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, in
 import app from './firebaseConfig.js';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
+const image = {uri: 'https://lh6.googleusercontent.com/proxy/2u8JACI6bBeCaamYijrU8jyhZGADPr2Px0MCGuWdzkubPwhW4T7PO40anM6ciozTRaelmP_1jIn9i9Qme59kqnm2Dg0-M2eEmtv9D7DBBxl3tSRX6hZCywdQgkdN9ZJSoYMxcg1AiWXCqhYY0TOTCgInHUd3'};
+
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
 
-// Navegação
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
-// Dados de usuário simulados (em um app real, estariam em um banco de dados)
 const users = [{ username: 'usuario', password: 'senha123' }];
 
-// Tela de Login
 const Login = ({ navigation, route }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -36,28 +35,42 @@ const Login = ({ navigation, route }) => {
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <ImageBackground source={image} style={styles.backgroundImage}>
+    <View style={styles.container}>
+    <Image
+          source={require('./assets/calm1.png')}
+          style={styles.logo}
+        />
+      <Text style={styles.title}>Bem-vindo!</Text>
+      <Text style={styles.subtitle}>Cuide de si hoje.</Text>
+      
       <TextInput
-        placeholder="Usuário"
+        placeholder="E-mail"
         value={username}
         onChangeText={setUsername}
-        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+          style={styles.input}
+          placeholderTextColor="#A9A9A9"
       />
       <TextInput
         placeholder="Senha"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+        style={styles.input}
+        placeholderTextColor="#A9A9A9"
       />
-      <Button title="Entrar" onPress={handleLogin} />
-      {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
-      <Button title="Registrar-se" onPress={() => navigation.navigate('Registrar')} />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Entrar</Text>
+        </TouchableOpacity>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <TouchableOpacity onPress={() => navigation.navigate('Registrar')}>
+          <Text style={styles.registerText}>Registrar-se</Text>
+        </TouchableOpacity>
     </View>
+    </ImageBackground>
   );
 };
 
-// Tela de Registro
 const Registrar = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -78,30 +91,43 @@ const Registrar = ({ navigation }) => {
   };
 
   return (
-    <View style={{ padding: 20 }}>
+    <ImageBackground source={image} style={styles.backgroundImage}>
+    <View style={styles.container}>
+    <Image
+          source={require('./assets/couple.png')}
+          style={styles.logo}
+        />
+      <Text style={styles.title}>Crie sua conta</Text>
+      <Text style={styles.subtitle}>para continuar</Text>
       <TextInput
-        placeholder="Usuário"
+        placeholder="E-mail"
         value={username}
         onChangeText={setUsername}
-        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+        style={styles.input}
+        placeholderTextColor="#A9A9A9"
       />
       <TextInput
         placeholder="Senha"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+        style={styles.input}
+        placeholderTextColor="#A9A9A9"
       />
       <TextInput
         placeholder="Confirmar Senha"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
-        style={{ borderBottomWidth: 1, marginBottom: 10 }}
+        style={styles.input}
+        placeholderTextColor="#A9A9A9"
       />
-      <Button title="Registrar" onPress={handleRegister} />
-      {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Registrar</Text>
+        </TouchableOpacity>
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
+    </ImageBackground>
   );
 };
 
@@ -117,7 +143,6 @@ const TabAvisos = () => (
   </View>
 );
 
-// Temporizador de Respiração
 const Respiracao = () => {
   const [fase, setFase] = useState('Inale');
   const [contador, setContador] = useState(4);
@@ -162,7 +187,7 @@ const Respiracao = () => {
 
     iniciarAnimacao(fase);
 
-    return () => clearInterval(intervalo); // Limpeza do intervalo
+    return () => clearInterval(intervalo);
   }, [fase]);
 
   return (
@@ -181,7 +206,6 @@ const Respiracao = () => {
   );
 };
 
-// Função principal App
 const App = () => {
   const [EstaLogado, setLogado] = useState(false);
 
@@ -219,7 +243,6 @@ const App = () => {
   );
 };
 
-// Componentes Home, Config e Contatos
 const Home = () => <Text>Home</Text>;
 const Config = () => <Text>Config</Text>;
 const Contatos = () => <Text>Contatos</Text>;
@@ -229,7 +252,87 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)', // Fundo semi-transparente
+    margin: 20,
+    borderRadius: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#4A90E2',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#7F8C8D',
+    marginBottom: 20,
+  },
+  welcomeText: {
+    height: 50,
+    fontSize: 20,
+    marginBottom: 20,
+    borderRadius: 30,
+    fontWeight: 'bold',
+    justifyContent: 'center'
+  },
+  button: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonSecondary: {
+    backgroundColor: '#2196F3',
+    padding: 10,
+    borderRadius: 4,
+    marginVertical: 5,
+    width: '100%',
+  },
+  input: {
+    height: 45,
+    width: '100%',
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    marginBottom: 15,
+  },
+  container2: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
     padding: 16,
+  },
+  backgroundImage: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+  },
+  errorText: {
+    color: '#E74C3C',
+    marginTop: 10,
+  },
+  registerText: {
+    color: '#4A90E2',
+    fontSize: 16,
+    marginTop: 15,
+    textDecorationLine: 'underline',
+  },
+  logo: {
+    width: 100, // Largura da imagem
+    height: 100, // Altura da imagem
+    marginBottom: 20, // Espaço entre a imagem e o título "Bem-vindo!"
   },
 });
 
