@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Text, TextInput, Animated, Easing, StyleSheet, ImageBackground, TouchableOpacity, Image, FlatList, Vibration } from 'react-native';
+import { View, Button, Text, TextInput, Animated, Easing, StyleSheet, ImageBackground, TouchableOpacity, Image, FlatList, Vibration, ScrollView, Linking } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -8,6 +8,7 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, in
 import app from './firebaseConfig.js';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { WebView } from 'react-native-webview';
+import { Calendar } from 'react-native-calendars';
 
 const image = {uri: 'https://lh6.googleusercontent.com/proxy/2u8JACI6bBeCaamYijrU8jyhZGADPr2Px0MCGuWdzkubPwhW4T7PO40anM6ciozTRaelmP_1jIn9i9Qme59kqnm2Dg0-M2eEmtv9D7DBBxl3tSRX6hZCywdQgkdN9ZJSoYMxcg1AiWXCqhYY0TOTCgInHUd3'};
 const image2 = {uri: 'https://img.freepik.com/premium-photo/vertical-photo-young-asian-woman-relaxed-meditating-sitting-outdoors-with-hands-together-eyes-closed-concept-spirituality-relax_362480-929.jpg'};
@@ -291,11 +292,80 @@ const Respiracao = () => {
   );
 };
 
-const Agendamento = () => (
-  <View style={styles.container}>
-    <Text>Agendamentos para consultas</Text>
-  </View>
-);
+const Agendamento = () => {
+  const [dataSelecionada, setDataSelecionada] = useState('');
+  const [horario, setHorario] = useState('');
+  const [tipoConsulta, setTipoConsulta] = useState('');
+  const horarios = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+
+  const handleAgendar = () => {
+    const telefone = "5521964850884"; // Insira o número do WhatsApp da psicóloga
+    const mensagem = `Olá, gostaria de agendar uma consulta particular: *${tipoConsulta}* para o dia 📅 *${dataSelecionada}* às 🕔 *${horario}hrs*. Vim pelo app 🩷`;
+    const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
+    Linking.openURL(url);
+  };
+
+  return (
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <View style={styles.containerAgen}>
+      <Text style={styles.titleAgen}>Selecione a data:</Text>
+
+      {/* Calendário para Seleção de Data */}
+      <Calendar
+        onDayPress={(day) => setDataSelecionada(day.dateString)}
+        markedDates={{
+          [dataSelecionada]: { selected: true, selectedColor: '#ADD8E6' },
+        }}
+      />
+
+      {/* Seleção de Horário */}
+      <Text style={styles.subtitleAgen}>Selecione o Horário:</Text>
+      <View style={styles.horariosContainer}>
+        {horarios.map((h) => (
+          <TouchableOpacity
+            key={h}
+            style={[styles.horario, horario === h && styles.horarioSelecionado]}
+            onPress={() => setHorario(h)}
+          >
+            <Text style={styles.horarioTexto}>{h}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Tipo de Consulta */}
+      <Text style={styles.subtitleAgen}>Tipo de Consulta:</Text>
+      <View style={styles.tipoContainer}>
+        <TouchableOpacity
+          style={[styles.tipoBotao, tipoConsulta === 'Online' && styles.tipoSelecionado]}
+          onPress={() => setTipoConsulta('Online')}
+        >
+          <Text style={styles.tipoTexto}>Online</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tipoBotao, tipoConsulta === 'Presencial' && styles.tipoSelecionado]}
+          onPress={() => setTipoConsulta('Presencial')
+          }
+        >
+          <Text style={styles.tipoTexto}>Presencial</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Botão para Redirecionar para o WhatsApp */}
+      <TouchableOpacity 
+        style={styles.zapzapButton} 
+        onPress={handleAgendar}
+        disabled={!dataSelecionada || !horario || !tipoConsulta}>
+          <Image
+            source={{ uri: 'https://web.whatsapp.com/favicon-64x64.ico' }} 
+            style={styles.buttonImageIconStyle}
+          />
+          <View style={styles.buttonIconSeparatorStyle}/>
+        <Text style={styles.buttonTextStyle}>Agendar no WhatsApp</Text>
+      </TouchableOpacity>
+    </View>
+    </ScrollView>
+  );
+};
 
 const SobreNos = () => (
   <View style={styles.container}>
@@ -362,7 +432,7 @@ const Home = ({ navigation }) => {
       
       <TouchableOpacity 
         style={styles.optionButton} 
-        onPress={() => alert('Função de agendamento em breve!')}
+        onPress={() => navigation.navigate('Agendamento')}
       >
         <Text style={styles.optionButtonText}>Agendamento de Consultas</Text>
       </TouchableOpacity>
@@ -514,6 +584,85 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#555',
   },
+  containerAgen: { 
+    flex: 1,
+    padding: 20 
+  },
+  titleAgen: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  subtitleAgen: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 20
+  },
+  horariosContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 10
+  },
+  horario: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    margin: 5
+  },
+  horarioSelecionado: {
+    backgroundColor: '#ADD8E6'
+  },
+  horarioTexto: { color: '#333'
+  },
+  tipoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 10
+  },
+  tipoBotao: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5
+  },
+  tipoSelecionado: {
+    backgroundColor: '#ADD8E6'
+  },
+  tipoTexto: {
+    color: '#333'
+  },
+  scrollContainer: {
+    paddingVertical: 20,
+  },
+  zapzapButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#31cc5a',
+    borderWidth: 0.5,
+    borderColor: '#fff',
+    height: 40,
+    borderRadius: 5,
+    margin: 5,
+  },
+  buttonImageIconStyle: {
+    padding: 10,
+    margin: 10,
+    height: 25,
+    width: 25,
+    resizeMode: 'stretch',
+  },
+  buttonIconSeparatorStyle: {
+    backgroundColor: 'fff',
+    width: 1,
+    height: 40,
+  },
+  buttonTextStyle: {
+    color: '#fff',
+    marginBottom: 4,
+    marginLeft: 10,
+  }
 });
 
 export default App;
