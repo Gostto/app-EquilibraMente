@@ -197,9 +197,9 @@ const TabAvisos = () => (
 );
 
 const Respiracao = () => {
-  const [fase, setFase] = useState('Inale');
+  const [fase, setFase] = useState('Inspire');
   const [contador, setContador] = useState(4);
-  const [respiracaoAtiva, setRespiracaoAtiva] = useState(false); // Para controlar se o ciclo está ativo
+  const [respiracaoAtiva, setRespiracaoAtiva] = useState(false);
   const animacao = useState(new Animated.Value(1))[0];
 
   const gifUrl = 'https://i.pinimg.com/originals/0c/3e/75/0c3e7535280bb0da6a39df25fd382a54.gif';
@@ -208,10 +208,10 @@ const Respiracao = () => {
     let duracao;
     let valor;
 
-    if (fase === 'Inale') {
+    if (fase === 'Inspire') {
       valor = 1.5;
       duracao = 4000;
-    } else if (fase === 'Exale') {
+    } else if (fase === 'Expire') {
       valor = 1;
       duracao = 6000;
     }
@@ -225,21 +225,23 @@ const Respiracao = () => {
   };
 
   useEffect(() => {
-    if (!respiracaoAtiva) return; // Só começa o ciclo se a respiração estiver ativa
+    if (!respiracaoAtiva) return;
 
     const cicloRespiracao = {
-      Inale: { proximaFase: 'Exale', duracao: 4 },
-      Exale: { proximaFase: 'Inale', duracao: 6 },
+      Inspire: { proximaFase: 'Expire', duracao: 6 },
+      Expire: { proximaFase: 'Inspire', duracao: 6 },
     };
 
     const intervalo = setInterval(() => {
       setContador((prev) => {
-        if (prev === 1) {
-          // Vibração ao final de cada ciclo
-          Vibration.vibrate([500, 1000, 1500]); // Vibração com intensidades crescentes
+        if (prev === 1) {       
+          Vibration.vibrate([500, 1000, 1500]);  // Vibração ao alternar fases
           setFase(cicloRespiracao[fase].proximaFase);
           return cicloRespiracao[fase].duracao;
         }
+        // Vibração crescente a cada segundo decorrido
+        const vibracaoTempo = Array(prev).fill(100);  // Cada segundo restante adiciona um pulso
+        Vibration.vibrate(vibracaoTempo);
         return prev - 1;
       });
     }, 1000);
@@ -251,7 +253,7 @@ const Respiracao = () => {
 
   const iniciarRespiracao = () => {
     setRespiracaoAtiva(true);
-    setFase('Inale'); // Reinicia para a fase inicial
+    setFase('Inspire');
     setContador(4);
   };
 
@@ -259,10 +261,16 @@ const Respiracao = () => {
     <ImageBackground source={image2} style={styles.backgroundImage}>
     <View style={styles.container}>
       {!respiracaoAtiva ? (
-        <Button title="Iniciar Respiração" onPress={iniciarRespiracao} />
+          <>
+          <Text style={styles.instructions}>
+            Encontre um lugar tranquilo e confortável. Sente-se com a coluna ereta e feche os olhos.
+            Quando estiver pronto, pressione o botão para iniciar o exercício de respiração.
+            Lembre-se de acompanhar o ritmo da respiração guiada e concentre-se apenas em seu ritmo respiratório.
+          </Text>
+          <Button title="Iniciar exercício" onPress={iniciarRespiracao} />
+        </>
       ) : (
         <>
-          {/* GIF posicionado acima do texto de fase */}
           <Image source={{ uri: gifUrl }} style={styles.gif} />
 
           <Text style={styles.title}>{fase} por {contador} segundos</Text>
@@ -376,12 +384,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)', // Fundo semi-transparente
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     margin: 20,
     borderRadius: 10,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#4A90E2',
     marginBottom: 10,
@@ -453,9 +461,9 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   logo: {
-    width: 100, // Largura da imagem
-    height: 100, // Altura da imagem
-    marginBottom: 20, // Espaço entre a imagem e o título "Bem-vindo!"
+    width: 100,
+    height: 100,
+    marginBottom: 20,
   },
   homeContainer: {
     flex: 1,
@@ -496,9 +504,15 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   gif: {
-    width: 250, // Tamanho menor para o GIF
+    width: 250,
     height: 250,
     marginBottom: 10,
+  },
+  instructions: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#555',
   },
 });
 
