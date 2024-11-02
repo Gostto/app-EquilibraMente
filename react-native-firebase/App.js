@@ -420,7 +420,7 @@ const App = () => {
     <NavigationContainer>
       {EstaLogado ? (
         <Stack.Navigator>
-        <Stack.Screen name="Início" component={HomeTab} options={{ headerShown: true }} />
+        <Stack.Screen name="EquilibraMente" component={HomeTab} options={{ headerShown: true }} />
       </Stack.Navigator>
       ) : (
         <Stack.Navigator>
