@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, Text, TextInput, Animated, Easing, StyleSheet, ImageBackground, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Button, Text, TextInput, Animated, Easing, StyleSheet, ImageBackground, TouchableOpacity, Image, FlatList, Vibration } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -10,6 +10,7 @@ import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { WebView } from 'react-native-webview';
 
 const image = {uri: 'https://lh6.googleusercontent.com/proxy/2u8JACI6bBeCaamYijrU8jyhZGADPr2Px0MCGuWdzkubPwhW4T7PO40anM6ciozTRaelmP_1jIn9i9Qme59kqnm2Dg0-M2eEmtv9D7DBBxl3tSRX6hZCywdQgkdN9ZJSoYMxcg1AiWXCqhYY0TOTCgInHUd3'};
+const image2 = {uri: 'https://img.freepik.com/premium-photo/vertical-photo-young-asian-woman-relaxed-meditating-sitting-outdoors-with-hands-together-eyes-closed-concept-spirituality-relax_362480-929.jpg'};
 
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
@@ -198,7 +199,10 @@ const TabAvisos = () => (
 const Respiracao = () => {
   const [fase, setFase] = useState('Inale');
   const [contador, setContador] = useState(4);
+  const [respiracaoAtiva, setRespiracaoAtiva] = useState(false); // Para controlar se o ciclo está ativo
   const animacao = useState(new Animated.Value(1))[0];
+
+  const gifUrl = 'https://i.pinimg.com/originals/0c/3e/75/0c3e7535280bb0da6a39df25fd382a54.gif';
 
   const iniciarAnimacao = (fase) => {
     let duracao;
@@ -221,15 +225,18 @@ const Respiracao = () => {
   };
 
   useEffect(() => {
+    if (!respiracaoAtiva) return; // Só começa o ciclo se a respiração estiver ativa
+
     const cicloRespiracao = {
-      Inale: { proximaFase: 'Segure', duracao: 4 },
-      Segure: { proximaFase: 'Exale', duracao: 4 },
+      Inale: { proximaFase: 'Exale', duracao: 4 },
       Exale: { proximaFase: 'Inale', duracao: 6 },
     };
 
     const intervalo = setInterval(() => {
       setContador((prev) => {
         if (prev === 1) {
+          // Vibração ao final de cada ciclo
+          Vibration.vibrate([500, 1000, 1500]); // Vibração com intensidades crescentes
           setFase(cicloRespiracao[fase].proximaFase);
           return cicloRespiracao[fase].duracao;
         }
@@ -240,22 +247,39 @@ const Respiracao = () => {
     iniciarAnimacao(fase);
 
     return () => clearInterval(intervalo); 
-  }, [fase]);
+  }, [fase, respiracaoAtiva]);
+
+  const iniciarRespiracao = () => {
+    setRespiracaoAtiva(true);
+    setFase('Inale'); // Reinicia para a fase inicial
+    setContador(4);
+  };
 
   return (
+    <ImageBackground source={image2} style={styles.backgroundImage}>
     <View style={styles.container}>
-      <Text style={styles.title}>{fase} por {contador} segundos</Text>
-      <Animated.View
-        style={{
-          width: 100,
-          height: 100,
-          borderRadius: 50,
-          backgroundColor: '#ADD8E6',
-          transform: [{ scale: animacao }],
-        }}
-      />
-      <Text style={styles.subText}>Respire profundamente e acalme sua mente.</Text>
+      {!respiracaoAtiva ? (
+        <Button title="Iniciar Respiração" onPress={iniciarRespiracao} />
+      ) : (
+        <>
+          {/* GIF posicionado acima do texto de fase */}
+          <Image source={{ uri: gifUrl }} style={styles.gif} />
+
+          <Text style={styles.title}>{fase} por {contador} segundos</Text>
+          {/*<Animated.View
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              backgroundColor: '#ADD8E6',
+              transform: [{ scale: animacao }],
+            }}
+          />*/}
+          <Text style={styles.subText}>Respire profundamente e acalme sua mente.</Text>
+        </>
+      )}
     </View>
+    </ImageBackground>
   );
 };
 
@@ -470,6 +494,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderRadius: 8,
     overflow: 'hidden',
+  },
+  gif: {
+    width: 250, // Tamanho menor para o GIF
+    height: 250,
+    marginBottom: 10,
   },
 });
 
