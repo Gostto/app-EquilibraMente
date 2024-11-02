@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import app from './firebaseConfig.js';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { WebView } from 'react-native-webview';
@@ -162,7 +162,6 @@ const dicas = [
 },
 ];
 
-
 const Dicas = () => {
   const renderItem = ({ item }) => {
     if (item.tipo === 'texto') {
@@ -299,7 +298,7 @@ const Agendamento = () => {
   const horarios = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
 
   const handleAgendar = () => {
-    const telefone = "5521964850884"; // Insira o número do WhatsApp da psicóloga
+    const telefone = "5521964850884";
     const mensagem = `Olá, gostaria de agendar uma consulta particular: *${tipoConsulta}* para o dia 📅 *${dataSelecionada}* às 🕔 *${horario}hrs*. Vim pelo app 🩷`;
     const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
     Linking.openURL(url);
@@ -368,8 +367,15 @@ const Agendamento = () => {
 };
 
 const SobreNos = () => (
-  <View style={styles.container}>
-    <Text></Text>
+  <View style={styles.container3}>
+    <Text style={styles.title3}>EquilibraMente</Text>
+    <Text style={styles.description}>
+      O EquilibraMente é um projeto desenvolvido para a faculdade, com o objetivo de auxiliar uma psicóloga
+      a captar novos pacientes e oferecer ferramentas para promover o bem-estar mental.
+    </Text>
+    <Text style={styles.creators}>Criado por:</Text>
+    <Text style={styles.names}>Brunna Mendanha, Emanuele Araújo, Gustavo Carvalho, Welinton Lima</Text>
+    <Text style={styles.version}>Versão 1.0</Text>
   </View>
 );
 
@@ -384,7 +390,7 @@ const App = () => {
       <Stack.Screen name="Agendamento" component={Agendamento} options={{ title: 'Agendamentos' }} />
       <Stack.Screen name="SobreNos" component={SobreNos} options={{ title: 'Sobre Nós' }} />
     </Stack.Navigator>
-  );
+  ); 
 
   const HomeTab = () => (
     <Tab.Navigator>
@@ -662,7 +668,43 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 4,
     marginLeft: 10,
-  }
+  },
+  container3: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#F5F5F5',
+  },
+  title3: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#4CAF50',
+  },
+  description: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginVertical: 10,
+    color: '#666',
+  },
+  creators: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 20,
+    color: '#333',
+  },
+  names: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 5,
+    color: '#666',
+  },
+  version: {
+    fontSize: 14,
+    marginTop: 30,
+    color: '#999',
+  },
 });
 
 export default App;
