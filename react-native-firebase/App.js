@@ -9,6 +9,7 @@ import app from './firebaseConfig.js';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { WebView } from 'react-native-webview';
 import { Calendar } from 'react-native-calendars';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const image = {uri: 'https://lh6.googleusercontent.com/proxy/2u8JACI6bBeCaamYijrU8jyhZGADPr2Px0MCGuWdzkubPwhW4T7PO40anM6ciozTRaelmP_1jIn9i9Qme59kqnm2Dg0-M2eEmtv9D7DBBxl3tSRX6hZCywdQgkdN9ZJSoYMxcg1AiWXCqhYY0TOTCgInHUd3'};
 const image2 = {uri: 'https://img.freepik.com/premium-photo/vertical-photo-young-asian-woman-relaxed-meditating-sitting-outdoors-with-hands-together-eyes-closed-concept-spirituality-relax_362480-929.jpg'};
@@ -19,7 +20,6 @@ const auth = initializeAuth(app, {
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
 
 const users = [{ username: 'usuario', password: 'senha123' }];
 
@@ -134,6 +134,34 @@ const Registrar = ({ navigation }) => {
   );
 };
 
+const FuncDicas = () => {
+  const renderItem = ({ item }) => {
+    if (item.tipo === 'texto') {
+      return (
+        <View style={styles.dicaContainer}>
+          <Text style={styles.dicaTexto}>{item.conteudo}</Text>
+        </View>
+      );
+    } else if (item.tipo === 'video') {
+      return (
+        <View style={styles.videoContainer}>
+          <WebView source={{ uri: item.conteudo }} style={{ height: 200, width: '100%' }} />
+        </View>
+      );
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={dicas}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+      />
+    </View>
+  );
+};
+
 const dicas = [
   {
     id: '1',
@@ -162,41 +190,7 @@ const dicas = [
 },
 ];
 
-const Dicas = () => {
-  const renderItem = ({ item }) => {
-    if (item.tipo === 'texto') {
-      return (
-        <View style={styles.dicaContainer}>
-          <Text style={styles.dicaTexto}>{item.conteudo}</Text>
-        </View>
-      );
-    } else if (item.tipo === 'video') {
-      return (
-        <View style={styles.videoContainer}>
-          <WebView source={{ uri: item.conteudo }} style={{ height: 200, width: '100%' }} />
-        </View>
-      );
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      <FlatList
-        data={dicas}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-      />
-    </View>
-  );
-};
-
-const TabAvisos = () => (
-  <View style={styles.container}>
-    <Text>Avisos e lembretes aparecerão aqui!</Text>
-  </View>
-);
-
-const Respiracao = () => {
+const FuncRespiracao = () => {
   const [fase, setFase] = useState('Inspire');
   const [contador, setContador] = useState(4);
   const [respiracaoAtiva, setRespiracaoAtiva] = useState(false);
@@ -291,7 +285,7 @@ const Respiracao = () => {
   );
 };
 
-const Agendamento = () => {
+const FuncAgendamento = () => {
   const [dataSelecionada, setDataSelecionada] = useState('');
   const [horario, setHorario] = useState('');
   const [tipoConsulta, setTipoConsulta] = useState('');
@@ -366,7 +360,7 @@ const Agendamento = () => {
   );
 };
 
-const SobreNos = () => (
+const FuncSobreNos = () => (
   <View style={styles.container3}>
     <Text style={styles.title3}>EquilibraMente</Text>
     <Text style={styles.description}>
@@ -379,33 +373,55 @@ const SobreNos = () => (
   </View>
 );
 
+const TabAvisos = () => (
+  <View style={styles.container}>
+    <Text>Avisos e lembretes aparecerão aqui!</Text>
+  </View>
+);
+
 const App = () => {
   const [EstaLogado, setLogado] = useState(false);
 
   const HomeStack = () => (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Stack.Screen name="Dicas" component={Dicas} options={{ title: 'Dicas para Mente' }} />
-      <Stack.Screen name="Respiracao" component={Respiracao} options={{ title: 'Exercício de Respiração' }} />
-      <Stack.Screen name="Agendamento" component={Agendamento} options={{ title: 'Agendamentos' }} />
-      <Stack.Screen name="SobreNos" component={SobreNos} options={{ title: 'Sobre Nós' }} />
+      <Stack.Screen name="Dicas" component={FuncDicas} options={{ title: 'Dicas para Mente' }} />
+      <Stack.Screen name="Respiracao" component={FuncRespiracao} options={{ title: 'Exercício de Respiração' }} />
+      <Stack.Screen name="Agendamento" component={FuncAgendamento} options={{ title: 'Agendamentos' }} />
+      <Stack.Screen name="SobreNos" component={FuncSobreNos} options={{ title: 'Sobre Nós' }} />
     </Stack.Navigator>
   ); 
 
   const HomeTab = () => (
     <Tab.Navigator>
-      <Tab.Screen name="Home_tab" component={HomeStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Avisos" component={TabAvisos} />
+      <Tab.Screen 
+        name="Início" 
+        component={HomeStack} 
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="home-outline" color={color} size={size} /> // Escolha o ícone que preferir
+          ),
+        }} 
+      />
+      <Tab.Screen 
+        name="Avisos" 
+        component={TabAvisos} 
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="alert-circle-outline" color={color} size={size} /> // Escolha o ícone que preferir
+          ),
+        }} 
+      />
     </Tab.Navigator>
   );
 
   return (
     <NavigationContainer>
       {EstaLogado ? (
-        <Drawer.Navigator>
-          <Drawer.Screen name="Home" component={HomeTab} />
-          
-        </Drawer.Navigator>
+        <Stack.Navigator>
+        <Stack.Screen name="Início" component={HomeTab} options={{ headerShown: true }} />
+      </Stack.Navigator>
       ) : (
         <Stack.Navigator>
           <Stack.Screen name="Login" component={Login} initialParams={{ funcLogar: setLogado }} />
