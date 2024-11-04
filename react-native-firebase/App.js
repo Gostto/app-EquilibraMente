@@ -13,6 +13,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const image = {uri: 'https://lh6.googleusercontent.com/proxy/2u8JACI6bBeCaamYijrU8jyhZGADPr2Px0MCGuWdzkubPwhW4T7PO40anM6ciozTRaelmP_1jIn9i9Qme59kqnm2Dg0-M2eEmtv9D7DBBxl3tSRX6hZCywdQgkdN9ZJSoYMxcg1AiWXCqhYY0TOTCgInHUd3'};
 const image2 = {uri: 'https://img.freepik.com/premium-photo/vertical-photo-young-asian-woman-relaxed-meditating-sitting-outdoors-with-hands-together-eyes-closed-concept-spirituality-relax_362480-929.jpg'};
+const image3 = {uri: 'https://i.imgur.com/DoVi2eu.jpeg'};
+const image4 = {uri: 'https://i.imgur.com/QZBG7GZ.png'};
 
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
@@ -152,6 +154,7 @@ const FuncDicas = () => {
   };
 
   return (
+    <ImageBackground source={image2} style={styles.backgroundImage}>
     <View style={styles.container}>
       <FlatList
         data={dicas}
@@ -159,6 +162,7 @@ const FuncDicas = () => {
         renderItem={renderItem}
       />
     </View>
+    </ImageBackground>
   );
 };
 
@@ -229,12 +233,11 @@ const FuncRespiracao = () => {
     const intervalo = setInterval(() => {
       setContador((prev) => {
         if (prev === 1) {       
-          Vibration.vibrate([500, 1000, 1500]);  // Vibração ao alternar fases
+          Vibration.vibrate([500, 1000, 1500]);
           setFase(cicloRespiracao[fase].proximaFase);
           return cicloRespiracao[fase].duracao;
         }
-        // Vibração crescente a cada segundo decorrido
-        const vibracaoTempo = Array(prev).fill(100);  // Cada segundo restante adiciona um pulso
+        const vibracaoTempo = Array(prev).fill(100);
         Vibration.vibrate(vibracaoTempo);
         return prev - 1;
       });
@@ -266,17 +269,7 @@ const FuncRespiracao = () => {
       ) : (
         <>
           <Image source={{ uri: gifUrl }} style={styles.gif} />
-
           <Text style={styles.title}>{fase} por {contador} segundos</Text>
-          {/*<Animated.View
-            style={{
-              width: 100,
-              height: 100,
-              borderRadius: 50,
-              backgroundColor: '#ADD8E6',
-              transform: [{ scale: animacao }],
-            }}
-          />*/}
           <Text style={styles.subText}>Respire profundamente e acalme sua mente.</Text>
         </>
       )}
@@ -303,7 +296,6 @@ const FuncAgendamento = () => {
     <View style={styles.containerAgen}>
       <Text style={styles.titleAgen}>Selecione a data:</Text>
 
-      {/* Calendário para Seleção de Data */}
       <Calendar
         onDayPress={(day) => setDataSelecionada(day.dateString)}
         markedDates={{
@@ -311,7 +303,6 @@ const FuncAgendamento = () => {
         }}
       />
 
-      {/* Seleção de Horário */}
       <Text style={styles.subtitleAgen}>Selecione o Horário:</Text>
       <View style={styles.horariosContainer}>
         {horarios.map((h) => (
@@ -325,7 +316,6 @@ const FuncAgendamento = () => {
         ))}
       </View>
 
-      {/* Tipo de Consulta */}
       <Text style={styles.subtitleAgen}>Tipo de Consulta:</Text>
       <View style={styles.tipoContainer}>
         <TouchableOpacity
@@ -343,7 +333,6 @@ const FuncAgendamento = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Botão para Redirecionar para o WhatsApp */}
       <TouchableOpacity 
         style={styles.zapzapButton} 
         onPress={handleAgendar}
@@ -373,11 +362,47 @@ const FuncSobreNos = () => (
   </View>
 );
 
-const TabAvisos = () => (
-  <View style={styles.container}>
-    <Text>Avisos e lembretes aparecerão aqui!</Text>
-  </View>
-);
+const avisosData = [
+  {
+    id: '1',
+    titulo: '🎄 Recesso de Fim de Ano',
+    descricao: 'Estaremos em recesso de 20 de dezembro a 5 de janeiro. Planeje suas consultas!',
+    data: '04/11/2024',
+  },
+  {
+    id: '2',
+    titulo: '🏷️ Promoções de Consultas Online',
+    descricao: 'Em julho, teremos promoções especiais para consultas online! Não percam!',
+    data: '01/11/2024',
+  },
+  {
+    id: '3',
+    titulo: '📍 Mudamos de endereço',
+    descricao: 'Estamos de endereço novo! Venha nos visitar na Avenida Maria Teresa, n⁰75 em Campo Grande',
+    data: '15/09/2024',
+  },
+
+
+];
+
+const TabAvisos = () => {
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={avisosData}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.avisoContainer}>
+            <Text style={styles.titulo}>{item.titulo}</Text>
+            <Text style={styles.descricao}>{item.descricao}</Text>
+            <Text style={styles.data}>{item.data}</Text>
+          </View>
+        )}
+        ListEmptyComponent={<Text>Sem avisos no momento!</Text>}
+      />
+    </View>
+  );
+};
 
 const App = () => {
   const [EstaLogado, setLogado] = useState(false);
@@ -385,7 +410,7 @@ const App = () => {
   const HomeStack = () => (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Stack.Screen name="Dicas" component={FuncDicas} options={{ title: 'Dicas para Mente' }} />
+      <Stack.Screen name="Dicas" component={FuncDicas} options={{ title: 'Dicas de Saúde' }} />
       <Stack.Screen name="Respiracao" component={FuncRespiracao} options={{ title: 'Exercício de Respiração' }} />
       <Stack.Screen name="Agendamento" component={FuncAgendamento} options={{ title: 'Agendamentos' }} />
       <Stack.Screen name="SobreNos" component={FuncSobreNos} options={{ title: 'Sobre Nós' }} />
@@ -400,7 +425,7 @@ const App = () => {
         options={{
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <Icon name="home-outline" color={color} size={size} /> // Escolha o ícone que preferir
+            <Icon name="home-outline" color={color} size={size} />
           ),
         }} 
       />
@@ -409,7 +434,7 @@ const App = () => {
         component={TabAvisos} 
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Icon name="alert-circle-outline" color={color} size={size} /> // Escolha o ícone que preferir
+            <Icon name="alert-circle-outline" color={color} size={size} />
           ),
         }} 
       />
@@ -434,7 +459,7 @@ const App = () => {
 
 const Home = ({ navigation }) => {
   return (
-    <ImageBackground source={image} style={styles.backgroundImage}>
+    <ImageBackground source={image3} style={styles.backgroundImage}>
     <View style={styles.homeContainer}>
       <Text style={styles.title}>Bem-vindo(a) ao EquilibraMente</Text>
       
@@ -442,7 +467,7 @@ const Home = ({ navigation }) => {
         style={styles.optionButton} 
         onPress={() => navigation.navigate('Dicas')}
       >
-        <Text style={styles.optionButtonText}>Dicas para Mente</Text>
+        <Text style={styles.optionButtonText}>Dicas de Saúde</Text>
       </TouchableOpacity>
       
       <TouchableOpacity 
@@ -720,6 +745,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 30,
     color: '#999',
+  },
+  avisoContainer: {
+    marginBottom: 16,
+    padding: 12,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  titulo: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  descricao: {
+    fontSize: 16,
+    color: '#333',
+  },
+  data: {
+    fontSize: 12,
+    color: '#777',
+    marginTop: 4,
   },
 });
 
